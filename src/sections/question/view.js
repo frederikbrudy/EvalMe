@@ -210,7 +210,7 @@ document.getElementById('refresh-view-questionnaire').addEventListener('click', 
     ipcRenderer.send('get-responses'); //add questionnaire ID
 });
 
-
+const groupResponses = false;
 ipcRenderer.on('responses', (event, data) => {
     console.log("responses received", data);
     console.log("questionnaire", data.questionnaire.title);
@@ -219,56 +219,65 @@ ipcRenderer.on('responses', (event, data) => {
     console.log("q", q);
     console.log("r", r);
     const datasets = [];
-    // q.forEach(question => {
-    //     const dataset = {
-    //         label: question.title,
-    //         // backgroundColor:
-    //         // borderColor
-    //         fill: false,
-    //         data: [],
-    //     };
-    //     const responses = r.filter(response => response.questionId === question.questionId);
-    //     responses.forEach(response => {
-    //         const dataResponse = {
-    //             x: new Date(response.createdAt),
-    //             y: response.value,
-    //         };
-    //         dataset.data.push(dataResponse)
-    //     });
-    //     datasets.push(dataset);
-    // });
-    q.forEach(question => {
-        const dataset = {
-            label: question.title,
-            // backgroundColor:
-            // borderColor
-            fill: false,
-            data: [],
-        };
-        const responses = r.filter(response => response.questionId === question.questionId);
-        let aggregator = 0;
-        let responseCount = 0;
-        let previousSet = responses[0].questionSet;
-        responses.forEach(response => {
-            if(response.questionSet !== previousSet){
-                //next set
-                dataset.data.push(aggregator / responseCount);
-                aggregator = 0;
-                responseCount = 0;
-            }
-            const dataResponse = {
-                x: new Date(response.createdAt),
-                y: response.value,
+    if(!groupResponses) {
+        q.forEach(question => {
+            const dataset = {
+                label: question.title,
+                // backgroundColor:
+                // borderColor
+                fill: false,
+                data: [],
             };
-            aggregator += response.value;
-            responseCount++;
+            const responses = r.filter(response => response.questionId === question.questionId);
+            responses.forEach(response => {
+                const dataResponse = {
+                    x: new Date(response.createdAt),
+                    y: response.value,
+                };
+                dataset.data.push(dataResponse)
+            });
+            datasets.push(dataset);
         });
+    }
+    else {
+        q.forEach(question => {
+            const dataset = {
+                label: question.title,
+                // backgroundColor:
+                // borderColor
+                fill: false,
+                data: [],
+            };
+            const responses = r.filter(response => response.questionId === question.questionId);
+            let aggregator = 0;
+            let responseCount = 0;
+            let currentSet = responses[0].questionSet;
+            responses.forEach(response => {
+                if (response.questionSet !== currentSet) {
+                    //next set
+                    const dataResponse = {
+                        x: currentSet,
+                        y: aggregator / responseCount,
+                    };
+                    dataset.data.push(dataResponse);
+                    aggregator = 0;
+                    responseCount = 0;
+                    currentSet = response.questionSet;
+                }
+                // const dataResponse = {
+                //     x: new Date(response.createdAt),
+                //     y: response.value,
+                // };
+                aggregator += response.value;
+                responseCount++;
+            });
 
-        const mean = aggregator / responses.length;
-        dataset.data = mean;
+            const mean = aggregator / responses.length;
+            dataset.data = mean;
 
-        datasets.push(dataset);
-    });
+            datasets.push(dataset);
+        });
+    }
 
     console.log("datasets", datasets);
 
