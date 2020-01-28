@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create new questionnaire</title>
+    <link rel="stylesheet" href="../../assets/css/variables.css">
+    <link rel="stylesheet" href="../../assets/css/nativize.css">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/about.css">
+    <link rel="stylesheet" href="../../assets/css/nav.css">
+    <link rel="stylesheet" href="../../assets/css/section.css">
+    <link rel="stylesheet" href="../../assets/css/demo.css">
+    <link rel="stylesheet" href="../../assets/css/github.css">
+</head>
+<body>
+<div class="section js-section u-category-general is-shown">
+    <header class="section-header">
+        <div class="section-wrapper">
+            <h1>Create new questionnaire</h1>
+            <h3>Create new question and print template</h3>
+        </div>
+    </header>
+    <div class="demo">
+        <div class="demo-wrapper">
+
+            <form id="questionnaireForm">
+                <div class="form-group">
+                    <label for="create-q-title" class="form-label">Title:</label>
+                    <input type="text" class="form-input" id="create-q-title" name="title" placeholder="Enter the question title">
+                </div>
+                <div class="form-group">
+                    <label for="create-q-question0" class="form-label">Question 1:</label>
+                    <input type="text" class="form-input" id="create-q-question0" name="question1" placeholder="Question 3">
+                </div>
+                <div class="form-group">
+                    <label for="create-q-question1" class="form-label">Question 2:</label>
+                    <input type="text" class="form-input" id="create-q-question1" name="question2" placeholder="Question 2">
+                </div>
+                <div class="form-group">
+                    <label for="create-q-question2" class="form-label">Question 3:</label>
+                    <input type="text" class="form-input" id="create-q-question2" name="question3" placeholder="Question 3">
+                </div>
+                <button id="submit" type="submit" class="demo-button">Submit</button>
+                <button id="reset" type="reset" class="demo-button">Reset</button>
+                <div class="error">
+                    <ul id="error-list"></ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="./addQuestionnaire.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "evalme",
+  "productName": "EvalMe",
+  "version": "1.0.0",
+  "description": "EvalMe",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-mac": "electron-packager . --platform=darwin"
+  },
+  "repository": "",
+  "keywords": [],
+  "author": "Frederik Brudy (fbrudy.net)",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^7.1.4",
+    "electron-packager": "^14.2.0",
+    "electron-rebuild": "^1.8.8"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "electron-log": "^4.0.0",
+    "electron-settings": "^3.2.0",
+    "electron-shortcut-normalizer": "^1.0.0",
+    "glob": "^7.1.6",
+    "highlight.js": "^9.17.1",
+    "md5": "^2.2.1",
+    "nedb": "^1.8.0",
+    "serialport": "^8.0.5",
+    "uuid": "^3.3.3"
+  }
+}

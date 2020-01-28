@@ -1,0 +1,41 @@
+.refresh-devices {
+  cursor: pointer;
+  transition: all 0.25s linear;
+}
+.refresh-devices:hover {
+  transform: rotate(90deg);
+  transition: all 0.2s linear;
+}
+.refresh-devices:active {
+  transform: rotate(360deg);
+}
+.green-text {
+  color: #4CAF50 !important;
+}
+.questionnaire-item.selected {
+  color: red;
+  font-weight: bold;
+}
+.red {
+  color: red !important;
+}
+.marginBtm {
+  margin-bottom: 0.5em;
+}
+#selected-questionnaire {
+  font-style: italic;
+}
+.connection-status {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.connection-status.connecting {
+  color: yellow;
+}
+.connection-status.connected {
+  color: green;
+}
+.connection-status.closed {
+  color: red;
+}
+/*# sourceMappingURL=main.css.map */

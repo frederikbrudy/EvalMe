@@ -1,0 +1,40 @@
+<template class="task-template">
+  <section id="question-create-section" class="section js-section u-category-general">
+    <header class="section-header">
+      <div class="section-wrapper">
+        <h1>
+          <svg class="section-icon"><use xlink:href="assets/img/icons.svg#icon-windows"></use></svg>
+          Create new questionnaire
+        </h1>
+        <h3>Create new questionnaire and print template</h3>
+        <button id="createQuestionnaire" type="button" class="demo-button">Create new questionnaire</button>
+        <button id="print-template" type="button" class="demo-button">Print template for a questionnaire</button>
+
+      </div>
+    </header>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+
+      </div>
+    </div>
+
+    <div class="demo marginBtm">
+      <div class="demo-wrapper">
+        <h2>Mark start/end of response set</h2>
+        <div class="marginBtm"><button class="demo-button question-set-new">New set</button>
+<!--          <button class="demo-button question-set-end">End current set</button>-->
+        </div>
+        <div>Current set: <span class="question-set-status"></span></div>
+      </div>
+    </div>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <h2>Existing questionnaires</h2>
+        <ul id="questionnaireList"></ul>
+      </div>
+    </div>
+
+  </section>
+</template>

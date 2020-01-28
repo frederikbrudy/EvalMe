@@ -1,0 +1,41 @@
+<template class="task-template">
+  <section id="testarea-testarea-section" class="section js-section u-category-settings">
+    <header class="section-header">
+      <div class="section-wrapper">
+        <h1>
+          <svg class="section-icon"><use xlink:href="assets/img/icons.svg#icon-windows"></use></svg>
+          Configure connection
+        </h1>
+        <h3>Connect manually or configure auto-connect.</h3>
+
+        <p>Here you can list the receiver devices connected to  this machine via USB, connect to each device, or configure auto-connect whenever a known device is detected.</p>
+
+      </div>
+    </header>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <div class="col s9">
+          <h3>Available devices <i class="refresh-devices material-icons green-text">refresh</i></h3>
+          <ul class="browser-default" id="available-devices">
+          </ul>
+          <div id="last-selection"></div>
+        </div>
+
+        <ul class="">
+
+        </ul>
+      </div>
+    </div>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <p>Info</p>
+        <p>Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, Electron <span id="electron-version"></span>.</p>
+        <p class="connection-status"></p>
+        <p class="connection-info"></p>
+      </div>
+    </div>
+
+  </section>
+</template>

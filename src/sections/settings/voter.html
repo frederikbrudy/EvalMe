@@ -1,0 +1,41 @@
+<template class="task-template">
+  <section id="settings-voter-section" class="section js-section u-category-settings">
+    <header class="section-header">
+      <div class="section-wrapper">
+        <h1>
+          <svg class="section-icon"><use xlink:href="assets/img/icons.svg#icon-windows"></use></svg>
+          Configure voting device
+        </h1>
+        <h3>Change settings of voting device.</h3>
+
+        <p>Once settings have been saved all LEDs on the voting device will flash green for several seconds to confirm that changes have been save successfully.</p>
+        <p>To load the current settings from the device click <a href="">refresh</a></p>
+      </div>
+    </header>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <h2>Required RFID card or not?</h2>
+        <button class="demo-button" id="login-require">Require Login</button>
+        <button class="demo-button" id="login-not-require">Do not require login</button>
+<!--        <ul class="">-->
+<!--          <li>Require login</li>-->
+<!--          <li>How many LEDs for each rotation tick?</li>-->
+<!--        </ul>-->
+      </div>
+    </div>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <h2>Set max value for selection:</h2>
+        <button class="demo-button voter-set-range" data-maxValue="3">3</button>
+        <button class="demo-button voter-set-range" data-maxValue="4">4</button>
+        <button class="demo-button voter-set-range" data-maxValue="5">5</button>
+        <button class="demo-button voter-set-range" data-maxValue="7">7</button>
+        <button class="demo-button voter-set-range" data-maxValue="10">10</button>
+        <button class="demo-button voter-set-range" data-maxValue="12">12</button>
+      </div>
+    </div>
+
+  </section>
+</template>

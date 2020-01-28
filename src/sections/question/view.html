@@ -1,0 +1,32 @@
+<template class="task-template">
+  <section id="question-view-section" class="section js-section u-category-general">
+    <header class="section-header">
+      <div class="section-wrapper">
+        <h1>
+          <svg class="section-icon"><use xlink:href="assets/img/icons.svg#icon-windows"></use></svg>
+          View collected data
+        </h1>
+        <h3>View aggregated and individual data</h3>
+<!--        <div>Select question-->
+<!--          <select name="question-list" id="question-list"></select>-->
+<!--        </div>-->
+        <button id="refresh-view-questionnaire">Refresh</button>
+
+      </div>
+    </header>
+
+    <div class="demo">
+      <div class="demo-wrapper">
+        <canvas id="myChart" width="400" height="400"></canvas>
+        <ul class="">
+          <li>Select which question</li>
+          <li>View aggregated data (delay with 5 minutes; optional refresh button)</li>
+          <li>View individual data for ID</li>
+        </ul>
+      </div>
+    </div>
+
+  </section>
+  <script src="./sections/question/view.js"></script>
+
+</template>

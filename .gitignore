@@ -1,0 +1,9 @@
+node_modules
+/.idea
+/EvalMe-darwin-x64
+/EvalMe-darwin-x64.zip
+/EvalMe-win32-x64.zip
+/EvalMe-win32-x64
+/EvalMe-linux-x64
+/EvalMe-mas-x64
+/build
