@@ -24,6 +24,7 @@
     "electron-shortcut-normalizer": "^1.0.0",
     "glob": "^7.1.6",
     "highlight.js": "^9.17.1",
+    "json2xls": "^0.1.2",
     "md5": "^2.2.1",
     "nedb": "^1.8.0",
     "serialport": "^8.0.5",

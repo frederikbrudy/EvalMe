@@ -161,6 +161,10 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
         });
     });
+    document.getElementById('export-data').addEventListener('click', e => {
+        e.preventDefault();
+        ipcRenderer.send('export-data');
+    })
 
 });
 

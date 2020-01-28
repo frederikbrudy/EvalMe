@@ -15,7 +15,9 @@ const {app, BrowserWindow, ipcMain, Menu, dialog, shell, screen } = require('ele
     , debug = require('debug')('EvalMe:main')
     , Datastore = require('nedb')
     , uuidv4 = require('uuid/v4')
-    , settings = require('electron-settings');
+    , settings = require('electron-settings')
+    , json2xls = require('json2xls')
+    , fs = require('fs');
 
 
 class Database {
@@ -534,6 +536,30 @@ const displayError = (args) => {
 ipcMain.on('open-error-dialog', (event, args) => {
     displayError(args);
 });
+
+ipcMain.on('export-data', (event, args) => {
+    dialog.showSaveDialog(mainWindow, {defaultPath: "export.xlsx"})
+        .then(({canceled, filePath, bookmark}) => {
+            if(!canceled){
+                console.log(filePath);
+                let questionnaireId = settings.get('currentquestionnaireId');
+                if(isDefined(args) && isDefined(args.questionnaireId)){
+                    questionnaireId = args.questionnaireId;
+                }
+                db.getQuestionnaire(questionnaireId)
+                    .then(questionnaire => {
+                        db.getResponses(questionnaireId)
+                            .then(responses => {
+                                // mainWindow.send('responses', {questionnaire: questionnaire[0], responses});
+                                const xls = json2xls(responses);
+                                fs.writeFileSync(filePath, xls, 'binary');
+                            })
+                    });
+            }
+        })
+});
+
+
 
 
 // In this file you can include the rest of your app's specific main process
