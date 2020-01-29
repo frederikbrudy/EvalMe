@@ -218,6 +218,9 @@ ipcRenderer.on('responses', (event, data) => {
     const r = data.responses;
     console.log("q", q);
     console.log("r", r);
+    const backgroundColors = ["rgba(255, 99, 132, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"];
+    const borderColor = ["rgb(255, 99, 132)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"];
+
     let datasets = [];
     const res = [];
     const colors = [
@@ -304,166 +307,149 @@ ipcRenderer.on('responses', (event, data) => {
     }
     else if(visualisationType === "bar"){
         colorSelection = 0;
-        let done = false;
-        const graph = [];
         let resultStr = "";
-        let questionCounter = 0;
-        q.forEach(question => {
-            const ctx = document.getElementById('chartQ'+questionCounter);
-            questionCounter++;
-            // if(done)
-            //     return;
-            // done = true;
-            datasets = [];
-            const dataset = {
-                label: question.title,
-                // ...colors[colorSelection],
-                fill: false,
-                backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
-                borderColor: ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
-                borderWidth: 1,
-                data: [],
-            };
-            // colorSelection++;
+        q.forEach((question, index) => {
+
             const responses = r.filter(response => {
                 return response.questionId === question.questionId;
             });
             const sets = {};
-            // let currentSet = null;
+
             let groups = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
             responses.forEach(response => {
-
                 if(!sets[response.questionSet]){
                     sets[response.questionSet] = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
                 }
-                // if(currentSet === null){
-                //     currentSet = response.questionSet;
-                //     sets.push(currentSet);
-                // }
-                // if(response.questionSet !== currentSet){
-                //     Object.keys(groups).forEach((key) => {
-                //         console.log(question.title, key, groups[key], response.questionSet); // value
-                //         dataset.data.push(groups[key]);
-                //     });
-                //     datasets.push(dataset);
-                //     groups = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
-                //     currentSet = response.questionSet;
-                //     sets.push(currentSet);
-                // }
-                // const dataResponse = {
-                //     x: new Date(response.createdAt),
-                //     y: response.value,
-                // };
                 if(!sets[response.questionSet][response.value]){
                     sets[response.questionSet][response.value] = 0;
                 }
                 sets[response.questionSet][response.value]++;
-                // dataset.data.push(response.value);
             });
+
+            let maxResponsesPerSetInQuestion = 0;
+            Object.values(sets).forEach((set) => {
+                Object.values(set).forEach(count => {
+                    if(count > maxResponsesPerSetInQuestion ){
+                        maxResponsesPerSetInQuestion = count;
+                    }
+                });
+            });
+
+
             resultStr += `<h2>${question.title}</h2>`;
+
+            const questionGroup = document.getElementById(`question-group${index}`);
+            const title = document.createElement("h1");
+            title.innerHTML = question.title;
+            questionGroup.appendChild(title);
+
             Object.keys(sets).forEach((setKey) => {
-                // const setData = sets[setKey];
-                // console.log(key); // key
-                // dataset.labels =
+                const setData = sets[setKey];
                 const orderedSetData = {};
-                Object.keys(sets[setKey]).sort().forEach(aggregatorKey => {
-                    orderedSetData[aggregatorKey] = sets[setKey][aggregatorKey];
+                Object.keys(setData).sort().forEach(aggregatorKey => {
+                    orderedSetData[aggregatorKey] = setData[aggregatorKey];
                 });
                 sets[setKey] = orderedSetData;
 
                 resultStr += `<h3>Set ${setKey}</h3><ul>`;
-                Object.keys(sets[setKey]).forEach(aggregatorKey => {
-                    resultStr += `<li>${aggregatorKey} by ${sets[setKey][aggregatorKey]} people</li>`;
-                    // dsClone.data.push(sets[setKey][aggregatorKey]);
+                Object.keys(setData).forEach(aggregatorKey => {
+                    resultStr += `<li>${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 });
                 resultStr += `</ul>`;
 
-                console.log(question.title, setKey, sets[setKey]);
+                const canvas = document.createElement('canvas');
+                canvas.setAttribute('width', '300');
+                canvas.setAttribute('height', '300');
 
-                const dsClone = JSON.parse(JSON.stringify(dataset));
-                dsClone.label = dsClone.label + " Set: " + setKey;
-                Object.keys(sets[setKey]).forEach(aggregatorKey => {
-                    dsClone.data.push(sets[setKey][aggregatorKey]);
-                });
-                // datasets.yAxisID = ""+setKey;
-                datasets.push(dsClone);
-            });
-            // Object.keys(orderedSetData).forEach(aggregatorKey => {
-            //     // dataset.data.push(sets[setKey]);
-            //     dataset.data.push(orderedSetData[aggregatorKey]);
-            // })
-            // console.log("sets", sets)
+                questionGroup.appendChild(canvas);
 
-            console.log("datasets", datasets);
-
-            const myBarChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(groups),
-                    // labels: ["January", "February", "March", "April", "May", "June", "July"],
-                    // datasets: datasets
-                    datasets
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: data.questionnaire.title
+                const myBarChart = new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(setData),
+                        datasets: [
+                            {
+                                label: question.title + " (Set " + setKey + ")",
+                                fill: false,
+                                backgroundColor: backgroundColors[index],//"rgba(255, 99, 132, 0.2)",
+                                borderColor: backgroundColors[index],//"rgb(255, 99, 132)",
+                                borderWidth: 1,
+                                data: Object.values(setData)
+                            },
+                        ]
                     },
-                    "scales": {
-                        // "xAxes":
-                        // [
-                        //     {
-                        //         stacked: true
-                        //     }
-                        // ],
-                        "yAxes":
-                            [
+                    options: {
+                        responsive: false,
+                        title: {
+                            display: true,
+                            text: " Set " + setKey,//data.questionnaire.title + " Set " + setKey
+                        },
+                        scales: {
+                            // xAxes: [{
+                            //     type: 'category',
+                            //     labels: Object.keys(setData),//['January', 'February', 'March', 'April', 'May', 'June']
+                            // }],
+                            yAxes: [
                                 {
-                                    "ticks": {
-                                        "beginAtZero": true
+                                    ticks: {
+                                        beginAtZero: true,
+                                        // suggestedMin: 50,
+                                        suggestedMax: maxResponsesPerSetInQuestion//responses.length
                                     },
-                                    // stacked: true
                                 }
                             ]
-                    },
-                }
+                        },
+                    }
+                });
             });
 
-            //[
-            //     {
-            //         "label": "My First Dataset",
-            //         "data": [65, 59, 80, 81, 56, 55, 40],
-            //         "fill": false,
-            //         "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
-            //         "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
-            //         "borderWidth": 1
+            // const myBarChart = new Chart(ctx, {
+            //     type: 'bar',
+            //     data: {
+            //         labels: ["Set1", "Set2", "Set3"],//Object.keys(groups),//Set1, Set2, Set3, etc
+            //         datasets: [
+            //             {
+            //                 label: question.title + " Set2",
+            //                 // ...colors[colorSelection],
+            //                 fill: false,
+            //                 backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
+            //                 borderColor: ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
+            //                 borderWidth: 1,
+            //                 // data: [{x:new Date(), y:20}, {x:new Date(), y:10}]
+            //                 // data: [{x:'2016-12-25', y:20}, {x:'2019-12-28', y:10}, {x:'2017-12-28', y:10}]
+            //                 data: [9, 15, 20]
+            //             },
+            //             {
+            //                 label: question.title + " Set3",
+            //                 // ...colors[colorSelection],
+            //                 fill: false,
+            //                 backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
+            //                 borderColor: ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
+            //                 borderWidth: 1,
+            //                 // data: [{x:new Date(), y:20}, {x:new Date(), y:10}]
+            //                 // data: [{x:'2016-11-25', y:20}, {x:'2019-11-28', y:10}, {x:'2017-11-28', y:10}]
+            //                 data: [9, 15, 20]
+            //             }
+            //         ]
             //     },
-            //     {
-            //         "label": "My second Dataset",
-            //         "data": [49, 25, 30, 65, 80, 23, 10],
-            //         "fill": false,
-            //         "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
-            //         "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
-            //         "borderWidth": 1
+            //     options: {
+            //         responsive: false,
+            //         title: {
+            //             display: true,
+            //             text: data.questionnaire.title
+            //         },
+            //         "scales": {
+            //             "yAxes": [ {"ticks": { "beginAtZero": true }, } ]
+            //         },
             //     }
-            // ]
-            //each set is a dataset
-            //each response is a
-            // datasets = [{
-            //     barPercentage: 0.5,
-            //     barThickness: 6,
-            //     maxBarThickness: 8,
-            //     minBarLength: 2,
-            //     data: [10, 20, 30, 40, 50, 60, 70]
-            // }];
+            // });
         });
         document.getElementById("resultContainer").innerHTML = resultStr;
 
     }
 
 
-    console.log("datasets", datasets);
+    // console.log("datasets", datasets);
     if(visualisationType === "bar"){
         // const myBarChart = new Chart(ctx, {
         //     type: 'bar',

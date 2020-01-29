@@ -38,4 +38,10 @@
 .connection-status.closed {
   color: red;
 }
+.canvas-wrapper {
+  max-width: none;
+}
+.canvas-wrapper .question-group canvas {
+  display: inline-block !important;
+}
 /*# sourceMappingURL=main.css.map */

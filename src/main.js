@@ -592,7 +592,7 @@ const getSerialPorts = () => new Promise((resolve, reject) => {
                 }
                 port.evalMe = false;
                 const ind = serial.readerIDs.indexOf(port.id);
-                if(port.manufacturer.indexOf("Arduino") > -1){
+                if(port.manufacturer && port.manufacturer.indexOf("Arduino") > -1){
                     port.evalMe = true;
                 }
                 if (ind > -1) {
