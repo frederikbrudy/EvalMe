@@ -177,7 +177,8 @@ ipcRenderer.on('responses', (event, data) => {
         }
     }
 
-    const backgroundColors = ["rgba(255, 99, 132, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"];
+    // const backgroundColors = ["rgba(255, 99, 132, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"];
+    const backgroundColors = [window.chartColors.yellow, window.chartColors.blue, window.chartColors.green, window.chartColors.red, window.chartColors.red];
     const borderColor = ["rgb(255, 99, 132)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"];
 
     let datasets = [];
@@ -283,6 +284,9 @@ ipcRenderer.on('responses', (event, data) => {
             const sets = {};
 
             let groups = {"0": 0, "1-4": 0, "5-8": 0, "9-12": 0};
+            allSets.forEach(allSet => {
+                sets[allSet._id] = JSON.parse(JSON.stringify(groups));
+            });
 
             responses.forEach(response => {
                 if (!sets[response.questionSet]) {
@@ -345,8 +349,8 @@ ipcRenderer.on('responses', (event, data) => {
 
                 const canvas = document.createElement('canvas');
                 canvas.classList.add(`set-${setKey}`);
-                canvas.setAttribute('width', '400');
-                canvas.setAttribute('height', '400');
+                canvas.setAttribute('width', '300');
+                canvas.setAttribute('height', '300');
 
                 questionGroup.appendChild(canvas);
 
@@ -459,8 +463,9 @@ ipcRenderer.on('responses', (event, data) => {
             let groups = {"0": 0, "1-4": 0, "5-8": 0, "9-12": 0};
 
             allSets.forEach(allSet => {
-                sets[allSets._id] = JSON.parse(JSON.stringify(groups));
+                sets[allSet._id] = JSON.parse(JSON.stringify(groups));
             });
+            // console.log("sets1", sets);
 
             responses.forEach(response => {
                 if (!sets[response.questionSet]) {
@@ -485,7 +490,7 @@ ipcRenderer.on('responses', (event, data) => {
                 sets[response.questionSet][responseValueKey]++;
             });
 
-            console.log("sets2", sets);
+            // console.log("sets2", sets);
 
 
             let maxResponsesPerSetInQuestion = 0;
@@ -544,8 +549,8 @@ ipcRenderer.on('responses', (event, data) => {
 
             const canvas = document.createElement('canvas');
             // canvas.classList.add(`set-${setKey}`);
-            canvas.setAttribute('width', '400');
-            canvas.setAttribute('height', '400');
+            canvas.setAttribute('width', '300');
+            canvas.setAttribute('height', '300');
 
             questionGroup.appendChild(canvas);
 
@@ -699,8 +704,8 @@ ipcRenderer.on('responses', (event, data) => {
 
                 const canvas = document.createElement('canvas');
                 canvas.classList.add(`set-${setKey}`);
-                canvas.setAttribute('width', '400');
-                canvas.setAttribute('height', '400');
+                canvas.setAttribute('width', '300');
+                canvas.setAttribute('height', '300');
 
                 questionGroup.appendChild(canvas);
 
