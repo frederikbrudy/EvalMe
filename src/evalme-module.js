@@ -5,11 +5,16 @@
 // selectively enable features needed in the rendering
 // process.
 
-const {ipcRenderer} = require('electron');
+const {ipcRenderer} = require('electron')
+    , settings = require('electron-settings');
 const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
     if (element) element.innerText = text
 };
+
+if(settings.get("hidden-sets") === undefined){
+    settings.set("hidden-sets", []);
+}
 
 //ipcRenderer.sendSync('synchronous-message', 'ping') //return value is pong
 //ipcRenderer.send('asynchronous-message', 'ping')
@@ -161,17 +166,61 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
         });
     });
+
     document.getElementById('export-data').addEventListener('click', e => {
         e.preventDefault();
         ipcRenderer.send('export-data');
-    })
+    });
+
+
+    setTimeout(() => {
+        document.getElementById("refresh-view-questionnaire").click();
+    }, 500);
 
 });
 
 ipcRenderer.on('question-set-status', (event, currentQuestionnaireSet) => {
-    console.log("question-set-status");
+    console.log("question-set-status", currentQuestionnaireSet);
     document.querySelectorAll('.question-set-status').forEach(item => {
-        item.innerHTML = currentQuestionnaireSet;
+        item.innerHTML = currentQuestionnaireSet.title;
+    });
+
+    const setsToHide = document.getElementById("sets-to-hide");
+    setsToHide.innerHTML = "";
+    currentQuestionnaireSet.allSets.forEach(set => {
+        const item = document.createElement("li");
+        item.classList.add("set");
+        item.dataset.setId = set._id;
+        item.addEventListener("click", e => {
+            item.classList.toggle("hidden-set");
+            let hiddenSets = settings.get("hidden-sets");
+
+            if(item.classList.contains("hidden-set")){
+                console.log("hide all with id", set._id);
+                //hide all sets with this key
+                document.querySelectorAll(`.set-${set._id}`).forEach(el => {
+                    el.classList.add("hidden");
+                });
+                hiddenSets.push(set._id);
+            }
+            else{
+                //make all sets with this key visible
+                document.querySelectorAll(`.set-${set._id}`).forEach(el => {
+                    el.classList.remove("hidden");
+                });
+
+                // hiddenSets = [];
+                // hiddenSets = hiddenSets.filter(s => s !== set._id);
+                hiddenSets.splice(hiddenSets.indexOf(set._id), 1)
+            }
+            console.log("hidden sets", hiddenSets);
+            settings.set("hidden-sets", hiddenSets);
+            // document.dispatchEvent(new Event("set-visibility-changed"));
+            document.getElementById("refresh-view-questionnaire").click();
+        });
+        item.innerText = set.title !== undefined ? set.title : set._id;
+        // const label = document.createElement("label");
+        setsToHide.appendChild(item);
     });
 });
 

@@ -78,7 +78,30 @@ body {
   .question-group {
     //overflow-x: scroll;
     canvas {
-      display: inline-block !important;
+      display: inline-block;
     }
+  }
+}
+
+#sets-to-hide{
+  display: inline;
+  li{
+    display: inline-block;
+    margin-right: 1em;
+  }
+  .set {
+    &.hidden-set {
+      text-decoration: line-through;
+    }
+  }
+}
+
+.hidden{
+  display: none !important;
+}
+
+.visType-selection{
+  &.selected{
+    background: beige;
   }
 }

@@ -17,7 +17,8 @@ const {app, BrowserWindow, ipcMain, Menu, dialog, shell, screen } = require('ele
     , uuidv4 = require('uuid/v4')
     , settings = require('electron-settings')
     , json2xls = require('json2xls')
-    , fs = require('fs');
+    , fs = require('fs')
+    , prompt = require('electron-prompt');
 
 
 class Database {
@@ -37,6 +38,31 @@ class Database {
             timestampData: true,
             autoload: true,
         });
+
+        this.db.sets = new Datastore({
+            filename: path.join(dbPath, "sets.db"),
+            timestampData: true,
+            autoload: true,
+        });
+    }
+
+    filterDuplicateResponses(docs){
+        const seenResponses = [];//array of "setKey-userId"
+        const filteredDocs = docs
+            .sort((a, b) => a.createdAt - b.createdAt) //sort in reverse order, so we only keep the latest response
+            .filter((response, index, arr) => {
+                if(response.userId !== undefined){
+                    const key = `${response.questionSet}-${response.userId}`;
+                    if(seenResponses.includes(key)){
+                        return false;
+                    }
+                    seenResponses.push(key);
+                }
+                return true;
+            });
+
+        filteredDocs.sort((a, b) => b.createdAt - a.createdAt);
+        return filteredDocs;
     }
 
     getQuestionnaires() {
@@ -77,10 +103,12 @@ class Database {
 
     getResponses(questionnaireId) {
         return new Promise((resolve, reject) => {
-            this.db.responses.find({questionnaireId: questionnaireId}).sort({createdAt: 1}).exec((err, docs) => {
+            this.db.responses.find({questionnaireId: questionnaireId}).sort({createdAt: -1}).exec((err, docs) => {
                 if(err)
                     reject(err);
-                resolve(docs);
+
+                const filteredDocs = this.filterDuplicateResponses(docs);
+                resolve(filteredDocs);
             });
         });
     }
@@ -113,6 +141,34 @@ class Database {
         });
     }
 
+    // insertResponse(questionnaireId, questionId, value, questionSet, userId = undefined){
+    //     return new Promise((resolve, reject) => {
+    //         const response = {
+    //             questionnaireId, //corresponds to the questionnaire
+    //             questionId, //corresponds to the knobs 1,2, or 3 on the device
+    //             userId,
+    //             value,
+    //             questionSet,
+    //         };
+    //
+    //         if(userId !== undefined){
+    //             this.db.responses.find({questionnaireId, questionId, questionSet, userId}).exec((err, responses) => {
+    //                 if(err)
+    //                     return reject(err);
+    //                 if(responses.length > 0){
+    //                     response._id = responses[0]._id;
+    //                 }
+    //             })
+    //         }
+    //         else {
+    //             // console.log("inserting response", response);
+    //             this.db.responses.insert(response, function (err, responseNewDoc) {
+    //                 resolve(responseNewDoc)
+    //             });
+    //         }
+    //     });
+    // }
+
     insertResponse(questionnaireId, questionId, value, questionSet, userId = undefined){
         return new Promise((resolve, reject) => {
             const response = {
@@ -125,6 +181,37 @@ class Database {
             // console.log("inserting response", response);
             this.db.responses.insert(response, function (err, responseNewDoc) {
                 resolve(responseNewDoc)
+            });
+        });
+    }
+
+    newSet(title){
+        return new Promise((resolve, reject) => {
+            const set = {
+                title,
+            };
+            this.db.sets.insert(set, function (err, setNewDoc) {
+                return resolve(setNewDoc);
+            });
+        });
+    }
+
+    getSet(setId){
+        return new Promise((resolve, reject) => {
+            this.db.sets.find({_id: setId}, (err, sets) => {
+                if(err)
+                    reject(err);
+                resolve(sets);
+            });
+        });
+    }
+
+    getSets(){
+        return new Promise((resolve, reject) => {
+            this.db.sets.find({}).sort({createdAt: 1}).exec((err, sets) => {
+                if(err)
+                    reject(err);
+                resolve(sets);
             });
         });
     }
@@ -269,13 +356,33 @@ function loadAndSendQuestionnaires() {
     });
 }
 
+ipcMain.on('question-set-get', (event, arg) => {
+    db.getSet(settings.get('currentQuestionnaireSet'))
+        .then(sets => {
+            const set = sets[0];
+            db.getSets()
+                .then(allSets => {
+                    mainWindow.send('question-set-status', {title: set.title, id: set._id, allSets});
+                });
+        })
+    // event.reply('question-set-status', settings.get('currentQuestionnaireSet'));
+});
+
 function loadAndSendSelectedQuestionnaire() {
     const currentquestionnaireId = settings.get('currentquestionnaireId');
     console.log("loaded currentquestionnaireId", currentquestionnaireId);
     if(currentquestionnaireId){
         mainWindow.send('selected-questionnaire', currentquestionnaireId);
-        mainWindow.send('question-set-status', settings.get('currentQuestionnaireSet'));
-        countAndSendResponsesSinceLastSet();
+        db.getSet(settings.get('currentQuestionnaireSet'))
+            .then(sets => {
+                const set = sets[0];
+                // console.log("loadAndSendSelectedQuestionnaire set", set);
+                db.getSets()
+                    .then(allSets => {
+                        mainWindow.send('question-set-status', {title: set.title, id: set._id, allSets});
+                        countAndSendResponsesSinceLastSet();
+                    })
+            })
     }
 }
 
@@ -291,30 +398,54 @@ function countAndSendResponsesSinceLastSet(questionnaireId = undefined, question
     console.log("loaded currentquestionnaireId", questionnaireId);
     console.log("loaded questionnaireSet", questionnaireSet);
     if(questionnaireId && questionnaireSet){
-        db.countResponsesInSet(questionnaireId, questionnaireSet).then(result => {
-            //result = {questionnaireId, questionSet, count}
-            mainWindow.send('question-set-responsesCount', {
-                questionnaireId: result.questionnaireId,
-                questionSet: result.questionSet,
-                count: result.count/3
-            });
-        });
+        db.getSet(questionnaireSet)
+            .then(set => {
+                db.countResponsesInSet(questionnaireId, questionnaireSet).then(result => {
+                    //result = {questionnaireId, questionSet, count}
+                    mainWindow.send('question-set-responsesCount', {
+                        questionnaireId: result.questionnaireId,
+                        questionSet: result.questionSet,
+                        questionSetTitle: set.title,
+                        questionSetTime: set.createdAt,
+                        count: result.count / 3
+                    });
+                });
+            })
 
     }
 }
 
 
 ipcMain.on('question-set-new', (event, arg) => {
-    let set = settings.get('currentQuestionnaireSet');
-    set++;
-    settings.set('currentQuestionnaireSet', set);
-    loadAndSendSelectedQuestionnaire();
+    prompt({
+        title: 'Create new Set',
+        label: 'Set title:',
+        value: new Date(),
+        inputAttrs: {
+            type: 'text',
+            required: true
+        },
+        type: 'input'
+    }, mainWindow)
+        .then((r) => {
+            if(r === null) {
+                // console.log('user cancelled');
+            } else {
+                console.log('result', r);
+                db.newSet(r)
+                    .then(setDoc => {
+                        console.log("new setDoc", setDoc);
+                        settings.set('currentQuestionnaireSet', setDoc._id);
+                        loadAndSendSelectedQuestionnaire();
+                    })
+            }
+        })
+        .catch(console.error);
+
 
 });
 
-ipcMain.on('question-set-get', (event, arg) => {
-    event.reply('question-set-status', settings.get('currentQuestionnaireSet'));
-});
+
 
 ipcMain.on('question-set-end', (event, arg) => {
     //not implemented / needed
@@ -330,7 +461,15 @@ function loadResponsesForQuestionnaire(questionnaireId){
             .then(questionnaire => {
                 db.getResponses(questionnaireId)
                     .then(responses => {
-                        mainWindow.send('responses', {questionnaire: questionnaire[0], responses});
+                        db.getSets()
+                            .then(sets => {
+                                // console.log("sets", sets);
+                                mainWindow.send('responses', {
+                                    questionnaire: questionnaire[0],
+                                    responses,
+                                    sets
+                                });
+                            })
                     })
             })
     }
@@ -685,15 +824,15 @@ const startSerialConnection = () => new Promise((resolve, reject) => {
                         // }
                         data.responses = [
                             {
-                                questionId: 1,
+                                questionId: 0,
                                 value: responses[2],
                             },
                             {
-                                questionId: 2,
+                                questionId: 1,
                                 value: responses[1],
                             },
                             {
-                                questionId: 3,
+                                questionId: 2,
                                 value: responses[0],
                             },
                         ];

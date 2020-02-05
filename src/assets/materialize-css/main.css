@@ -42,6 +42,22 @@
   max-width: none;
 }
 .canvas-wrapper .question-group canvas {
-  display: inline-block !important;
+  display: inline-block;
+}
+#sets-to-hide {
+  display: inline;
+}
+#sets-to-hide li {
+  display: inline-block;
+  margin-right: 1em;
+}
+#sets-to-hide .set.hidden-set {
+  text-decoration: line-through;
+}
+.hidden {
+  display: none !important;
+}
+.visType-selection.selected {
+  background: beige;
 }
 /*# sourceMappingURL=main.css.map */
