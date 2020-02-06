@@ -158,13 +158,13 @@ document.querySelectorAll(".visType-selection").forEach(el => {
 ipcRenderer.on('responses', (event, data) => {
     //delete all responses
     console.log("responses received", data);
-    console.log("questionnaire", data.questionnaire.title);
+    // console.log("questionnaire", data.questionnaire.title);
     const q = data.questionnaire.questions;
     const r = data.responses;
     const allSets = data.sets;
     // console.log("q", q);
     // console.log("r", r);
-    console.log("allSets", allSets);
+    // console.log("allSets", allSets);
 
     const hiddenSets = settings.get("hidden-sets");
     const setsToHide = document.getElementById("sets-to-hide");
@@ -237,7 +237,7 @@ ipcRenderer.on('responses', (event, data) => {
             let aggregator = 0;
             let responseCount = 0;
             let currentSet = responses[0].questionSet;
-            console.log('currentSet', responses[0]);
+            // console.log('currentSet', responses[0]);
             responses.forEach(response => {
                 if (response.questionSet !== currentSet) {
                     //next set
@@ -504,7 +504,7 @@ ipcRenderer.on('responses', (event, data) => {
                     }
                 });
             });
-            console.log("sets", sets);
+            // console.log("sets", sets);
 
             resultStr += `<h2>${question.title}</h2>`;
 

@@ -5,7 +5,7 @@
 // selectively enable features needed in the rendering
 // process.
 
-const {ipcRenderer} = require('electron')
+const {ipcRenderer, shell} = require('electron')
     , settings = require('electron-settings');
 const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
@@ -175,7 +175,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setTimeout(() => {
         document.getElementById("refresh-view-questionnaire").click();
-        document.getElementById("db-path").innerHTML = ipcRenderer.sendSync('get-db-path');
+        const dbPathContainer = document.getElementById("db-path");
+        const dpPath = ipcRenderer.sendSync('get-db-path');
+        dbPathContainer.innerHTML = dpPath;
+        dbPathContainer.addEventListener("click", e => {
+            shell.showItemInFolder(dpPath);
+        });
     }, 500);
 
 });
@@ -234,7 +239,7 @@ ipcRenderer.on('question-set-responsesCount', (event, result) => {
 });
 
 ipcRenderer.on('questionnaires', (event, questionnaires) => {
-    console.log("questionnaires list updated", questionnaires);
+    // console.log("questionnaires list updated", questionnaires);
     const questionnaireList = document.getElementById('questionnaireList');
     const questionnaireItems = questionnaires.reduce((html, questionnaire) => {
         html += `<li class="questionnaire-item" id="question-${questionnaire._id}" data-questionid="${questionnaire._id}">

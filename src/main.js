@@ -51,13 +51,18 @@ class Database {
     }
 
     filterDuplicateResponses(docs){
-        const seenResponses = [];//array of "setKey-userId"
+        const seenResponses = [];//array of "questionnaireId#questionSet#questionId#userId"
         const filteredDocs = docs
-            .sort((a, b) => b.createdAt - a.createdAt) //sort in reverse order, so we only keep the latest response
+            .sort((a, b) => {
+                //sort in reverse order, so we only keep the latest response (it should already come in reverse order, but just to be sure
+                return b.createdAt - a.createdAt;
+            })
             .filter((response, index, arr) => {
                 if(response.userId !== undefined){
-                    const key = `${response.questionSet}-${response.userId}`;
+                    //this response contains a user ID. Make sure we have not seen this use for this question within this set before
+                    const key = `${response.questionnaireId}#${response.questionSet}#${response.questionId}#${response.userId}`;
                     if(seenResponses.includes(key)){
+                        //The user has voted before. Since the data is sorted in revers order, we'll only keep the latest vote.
                         return false;
                     }
                     seenResponses.push(key);
@@ -65,7 +70,7 @@ class Database {
                 return true;
             });
 
-        filteredDocs.sort((a, b) => b.createdAt - a.createdAt);
+        filteredDocs.sort((a, b) => a.createdAt - b.createdAt);
         return filteredDocs;
     }
 
@@ -107,7 +112,7 @@ class Database {
 
     getResponses(questionnaireId) {
         return new Promise((resolve, reject) => {
-            this.db.responses.find({questionnaireId: questionnaireId}).sort({createdAt: -1}).exec((err, docs) => {
+            this.db.responses.find({questionnaireId}).sort({createdAt: -1}).exec((err, docs) => {
                 if(err)
                     reject(err);
 
@@ -119,13 +124,28 @@ class Database {
 
     countResponsesInSet(questionnaireId, questionSet){
         //count number of DB entries where currentQuestionnaireSet and currentQuestionnaireId
+        //cannot use the count function, as we want to filter out duplicate responses
         return new Promise((resolve, reject) => {
-            this.db.responses.count({questionnaireId, questionSet}, function (err, count) {
+            this.db.responses.find({questionnaireId, questionSet}).sort({createdAt: -1}).exec((err, docs) => {
                 if(err)
-                    return reject(err);
-                resolve({questionnaireId, questionSet, count});
+                    reject(err);
+
+                const filteredDocs = this.filterDuplicateResponses(docs);
+                console.log("filteredDocs", filteredDocs.length);
+                resolve({
+                    questionnaireId,
+                    questionSet,
+                    count: filteredDocs.length
+                });
             });
         });
+        // return new Promise((resolve, reject) => {
+        //     this.db.responses.count({questionnaireId, questionSet}, function (err, count) {
+        //         if(err)
+        //             return reject(err);
+        //         resolve({questionnaireId, questionSet, count});
+        //     });
+        // });
     }
 
     insertNewQuestion(title, questions){
@@ -145,33 +165,42 @@ class Database {
         });
     }
 
-    // insertResponse(questionnaireId, questionId, value, questionSet, userId = undefined){
-    //     return new Promise((resolve, reject) => {
-    //         const response = {
-    //             questionnaireId, //corresponds to the questionnaire
-    //             questionId, //corresponds to the knobs 1,2, or 3 on the device
-    //             userId,
-    //             value,
-    //             questionSet,
-    //         };
-    //
-    //         if(userId !== undefined){
-    //             this.db.responses.find({questionnaireId, questionId, questionSet, userId}).exec((err, responses) => {
-    //                 if(err)
-    //                     return reject(err);
-    //                 if(responses.length > 0){
-    //                     response._id = responses[0]._id;
-    //                 }
-    //             })
-    //         }
-    //         else {
-    //             // console.log("inserting response", response);
-    //             this.db.responses.insert(response, function (err, responseNewDoc) {
-    //                 resolve(responseNewDoc)
-    //             });
-    //         }
-    //     });
-    // }
+    insertOrUpdateResponse(questionnaireId, questionId, value, questionSet, userId = undefined){
+        return new Promise((resolve, reject) => {
+            const response = {
+                questionnaireId, //corresponds to the questionnaire
+                questionId, //corresponds to the knobs 1,2, or 3 on the device
+                userId,
+                value,
+                questionSet,
+            };
+
+            if(userId !== undefined){
+                this.db.responses.find({questionnaireId, questionId, questionSet, userId}).exec((err, responses) => {
+                    if(err)
+                        return reject(err);
+                    if(responses.length > 0){
+                        response._id = responses[0]._id;
+                        console.log("updating", response._id);
+                        this.db.responses.update(response._id, function (err, responseNewDoc) {
+                            resolve(responseNewDoc)
+                        });
+                    }
+                    else{
+                        this.db.responses.insert(response, function (err, responseNewDoc) {
+                            resolve(responseNewDoc)
+                        });
+                    }
+                })
+            }
+            else {
+                // console.log("inserting response", response);
+                this.db.responses.insert(response, function (err, responseNewDoc) {
+                    resolve(responseNewDoc)
+                });
+            }
+        });
+    }
 
     insertResponse(questionnaireId, questionId, value, questionSet, userId = undefined){
         return new Promise((resolve, reject) => {
@@ -374,7 +403,7 @@ ipcMain.on('question-set-get', (event, arg) => {
 
 function loadAndSendSelectedQuestionnaire() {
     const currentquestionnaireId = settings.get('currentquestionnaireId');
-    console.log("loaded currentquestionnaireId", currentquestionnaireId);
+    // console.log("loaded currentquestionnaireId", currentquestionnaireId);
     if(currentquestionnaireId){
         mainWindow.send('selected-questionnaire', currentquestionnaireId);
         db.getSet(settings.get('currentQuestionnaireSet'))
@@ -399,8 +428,8 @@ function countAndSendResponsesSinceLastSet(questionnaireId = undefined, question
     if(notDefined(questionnaireSet)){
         questionnaireSet = settings.get('currentQuestionnaireSet');
     }
-    console.log("loaded currentquestionnaireId", questionnaireId);
-    console.log("loaded questionnaireSet", questionnaireSet);
+    // console.log("loaded currentquestionnaireId", questionnaireId);
+    // console.log("loaded questionnaireSet", questionnaireSet);
     if(questionnaireId && questionnaireSet){
         db.getSet(questionnaireSet)
             .then(set => {
@@ -435,10 +464,10 @@ ipcMain.on('question-set-new', (event, arg) => {
             if(r === null) {
                 // console.log('user cancelled');
             } else {
-                console.log('result', r);
+                // console.log('result', r);
                 db.newSet(r)
                     .then(setDoc => {
-                        console.log("new setDoc", setDoc);
+                        // console.log("new setDoc", setDoc);
                         settings.set('currentQuestionnaireSet', setDoc._id);
                         loadAndSendSelectedQuestionnaire();
                     })
@@ -486,21 +515,21 @@ ipcMain.on('get-responses', (event, args) => {
         questionnaireId = args.questionnaireId;
     }
 
-    console.log("getting responses for questionnaire", questionnaireId);
+    // console.log("getting responses for questionnaire", questionnaireId);
     loadResponsesForQuestionnaire(questionnaireId);
 });
 
 ipcMain.on('select-questionnaire', (event, questionId) => {
-    console.log("setting currentquestionnaireId", questionId);
+    // console.log("setting currentquestionnaireId", questionId);
     settings.set('currentquestionnaireId', questionId);
     loadAndSendSelectedQuestionnaire();
 });
 
 ipcMain.on('delete-questionnaire', (event, questionnaireId) => {
-    console.log("setting currentquestionnaireId", questionnaireId);
+    // console.log("setting currentquestionnaireId", questionnaireId);
     db.deleteQuestionnaire(questionnaireId)
         .then(result => {
-            console.log("delete result", result);
+            // console.log("delete result", result);
             if(settings.get('currentquestionnaireId') === questionnaireId){
                 settings.set('currentquestionnaireId', undefined);
             }
@@ -508,7 +537,7 @@ ipcMain.on('delete-questionnaire', (event, questionnaireId) => {
             loadAndSendSelectedQuestionnaire();
         })
         .catch(e => {
-            console.log("error deleting", e);
+            // console.log("error deleting", e);
             mainWindow.send('error', e);
         })
 });
@@ -675,7 +704,7 @@ const displayError = (args) => {
         buttons: ['OK']
     })
         .then((response, checkboxCheched) => {
-            console.log("selected", response);
+            // console.log("selected", response);
         });
 };
 
