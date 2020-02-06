@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setTimeout(() => {
         document.getElementById("refresh-view-questionnaire").click();
+        document.getElementById("db-path").innerHTML = ipcRenderer.sendSync('get-db-path');
     }, 500);
 
 });

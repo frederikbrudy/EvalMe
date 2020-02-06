@@ -25,31 +25,35 @@ class Database {
     constructor(settings){
         this._settings = settings || {};
         this.db = {};
-        const dbPath = path.join(app.getPath('userData'), "data");
-        console.log('dbPath', dbPath);
+        this.dbPath = path.join(app.getPath('userData'), "data");
+        console.log('dbPath', this.dbPath);
         this.db.questionnaires = new Datastore({
-            filename: path.join(dbPath, "questionnaires.db"),
+            filename: path.join(this.dbPath, "questionnaires.db"),
             timestampData: true,
             autoload: true,
         });
 
         this.db.responses = new Datastore({
-            filename: path.join(dbPath, "responses.db"),
+            filename: path.join(this.dbPath, "responses.db"),
             timestampData: true,
             autoload: true,
         });
 
         this.db.sets = new Datastore({
-            filename: path.join(dbPath, "sets.db"),
+            filename: path.join(this.dbPath, "sets.db"),
             timestampData: true,
             autoload: true,
         });
     }
 
+    getDbPath(){
+        return this.dbPath;
+    }
+
     filterDuplicateResponses(docs){
         const seenResponses = [];//array of "setKey-userId"
         const filteredDocs = docs
-            .sort((a, b) => a.createdAt - b.createdAt) //sort in reverse order, so we only keep the latest response
+            .sort((a, b) => b.createdAt - a.createdAt) //sort in reverse order, so we only keep the latest response
             .filter((response, index, arr) => {
                 if(response.userId !== undefined){
                     const key = `${response.questionSet}-${response.userId}`;
@@ -603,13 +607,17 @@ ipcMain.on('refresh-devices', (event, arg) => {
     getAndSendPortsToMainWindow();
 });
 
+ipcMain.on('get-db-path', (event, arg) => {
+    event.returnValue = db.getDbPath();
+});
+
 ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log(arg); // prints "ping"
+    console.log(arg);
     event.reply('asynchronous-reply', 'pong')
 });
 
 ipcMain.on('synchronous-message', (event, arg) => {
-    console.log(arg); // prints "ping"
+    console.log(arg);
     event.returnValue = 'pong'
 });
 

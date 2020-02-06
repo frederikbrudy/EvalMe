@@ -285,15 +285,18 @@ ipcRenderer.on('responses', (event, data) => {
 
             let groups = {"0": 0, "1-4": 0, "5-8": 0, "9-12": 0};
             allSets.forEach(allSet => {
-                sets[allSet._id] = JSON.parse(JSON.stringify(groups));
+                if(!hiddenSets.includes(allSet._id)) {
+                    sets[allSet._id] = JSON.parse(JSON.stringify(groups));
+                }
             });
 
             responses.forEach(response => {
                 if (!sets[response.questionSet]) {
                     sets[response.questionSet] = JSON.parse(JSON.stringify(groups))//
                 }
+                response.value = parseInt(response.value);
                 let responseValueKey = "-1";
-                if (response.value === 0) {
+                if (response.value <= 0) {
                     responseValueKey = "0";
                 }
                 else if (response.value <= 4) {
@@ -463,7 +466,9 @@ ipcRenderer.on('responses', (event, data) => {
             let groups = {"0": 0, "1-4": 0, "5-8": 0, "9-12": 0};
 
             allSets.forEach(allSet => {
-                sets[allSet._id] = JSON.parse(JSON.stringify(groups));
+                if(!hiddenSets.includes(allSet._id)){
+                    sets[allSet._id] = JSON.parse(JSON.stringify(groups));
+                }
             });
             // console.log("sets1", sets);
 
@@ -471,6 +476,7 @@ ipcRenderer.on('responses', (event, data) => {
                 if (!sets[response.questionSet]) {
                     sets[response.questionSet] = JSON.parse(JSON.stringify(groups));
                 }
+                response.value = parseInt(response.value);
                 let responseValueKey = "-1";
                 if (response.value === 0) {
                     responseValueKey = "0";
@@ -489,9 +495,6 @@ ipcRenderer.on('responses', (event, data) => {
                 }
                 sets[response.questionSet][responseValueKey]++;
             });
-
-            // console.log("sets2", sets);
-
 
             let maxResponsesPerSetInQuestion = 0;
             Object.values(sets).forEach((set) => {
@@ -514,9 +517,7 @@ ipcRenderer.on('responses', (event, data) => {
             Object.keys(sets).forEach((setKey) => {
                 const setData = sets[setKey];
                 const set = allSets.find(set => set._id === setKey);
-                // console.log("set-raw", set, setKey);
                 const title = set!==undefined ? set.title : setKey;
-                // console.log("title", title);
                 const orderedSetData = {};
                 Object.keys(setData).sort().forEach(aggregatorKey => {
                     // console.log("aggregatorKey", aggregatorKey);
