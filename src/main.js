@@ -588,7 +588,7 @@ function createWindow() {
     mainWindow.loadFile('src/index.html');
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools({mode: "detach"});
+    // mainWindow.webContents.openDevTools({mode: "detach"});
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -722,14 +722,39 @@ ipcMain.on('export-data', (event, args) => {
                 if(isDefined(args) && isDefined(args.questionnaireId)){
                     questionnaireId = args.questionnaireId;
                 }
-                db.getQuestionnaire(questionnaireId)
-                    .then(questionnaire => {
-                        db.getResponses(questionnaireId)
-                            .then(responses => {
-                                // mainWindow.send('responses', {questionnaire: questionnaire[0], responses});
-                                const xls = json2xls(responses);
-                                fs.writeFileSync(filePath, xls, 'binary');
-                            })
+                db.getSets()
+                    .then(allSets => {
+                        db.getQuestionnaire(questionnaireId)
+                            .then(questionnaires => {
+                                console.log("questionnaire", questionnaires);
+                                const questionnaire = questionnaires[0];
+
+                                db.getResponses(questionnaireId)
+                                    .then(responses => {
+                                        // mainWindow.send('responses', {questionnaire: questionnaire[0], responses});
+                                        responses.forEach(response => {
+                                            const question = questionnaire.questions.find(q => q.questionId === response.questionId);
+                                            const set = allSets.find(s => s._id === response.questionSet);
+                                            response.questionnaireTitle = questionnaire.title;
+                                            response.questionTitle = question.title;
+                                            response.questionSetTitle = set.title;
+                                        });
+                                        const xls = json2xls(responses, {
+                                            fields: {
+                                                createdAt: "string",
+                                                questionnaireId: 'string',
+                                                questionnaireTitle: "string",
+                                                questionId: "number",
+                                                questionTitle: "string",
+                                                questionSet: "string",
+                                                questionSetTitle: "string",
+                                                userId: "string",
+                                                value: "number"
+                                            }
+                                        });
+                                        fs.writeFileSync(filePath, xls, 'binary');
+                                    })
+                            });
                     });
             }
         })

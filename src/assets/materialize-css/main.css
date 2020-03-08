@@ -60,4 +60,13 @@
 .visType-selection.selected {
   background: beige;
 }
+.demo-button {
+  margin: 0.25em 0.25em 0.25em 0;
+}
+.demo-button:first-of-type {
+  margin-left: 0.5em;
+}
+label {
+  margin-right: 0.5em;
+}
 /*# sourceMappingURL=main.css.map */
