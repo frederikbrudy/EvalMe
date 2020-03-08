@@ -876,8 +876,8 @@ ipcRenderer.on('responses', (event, data) => {
 
             const canvas = document.createElement('canvas');
             // canvas.classList.add(`set-${setKey}`);
-            canvas.setAttribute('width', '300');
-            canvas.setAttribute('height', '300');
+            canvas.setAttribute('width', '400');
+            canvas.setAttribute('height', '400');
 
             questionGroup.appendChild(canvas);
 
