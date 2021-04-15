@@ -139,13 +139,6 @@ class Database {
                 });
             });
         });
-        // return new Promise((resolve, reject) => {
-        //     this.db.responses.count({questionnaireId, questionSet}, function (err, count) {
-        //         if(err)
-        //             return reject(err);
-        //         resolve({questionnaireId, questionSet, count});
-        //     });
-        // });
     }
 
     insertNewQuestion(title, questions){
@@ -451,8 +444,8 @@ function countAndSendResponsesSinceLastSet(questionnaireId = undefined, question
 
 ipcMain.on('question-set-new', (event, arg) => {
     prompt({
-        title: 'Create new Set',
-        label: 'Set title:',
+        title: 'Create new answer round',
+        label: 'Round title:',
         value: new Date(),
         inputAttrs: {
             type: 'text',

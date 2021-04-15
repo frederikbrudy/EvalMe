@@ -320,7 +320,7 @@ ipcRenderer.on('responses', (event, data) => {
     }
 
     // const backgroundColors = ["rgba(255, 99, 132, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"];
-    const backgroundColors = [window.chartColors.yellow, window.chartColors.blue, window.chartColors.green, window.chartColors.red, window.chartColors.red];
+    const backgroundColors = [window.chartColors.yellow, window.chartColors.blue, window.chartColors.green, window.chartColors.red, window.chartColors.orange, window.chartColors.purple];
     const borderColor = ["rgb(255, 99, 132)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"];
 
     let datasets = [];
@@ -397,8 +397,8 @@ ipcRenderer.on('responses', (event, data) => {
                     suggestedMax = localMax;
                 }
 
-                // resultStr += `<div class="set-${setKey}"><h3 >Set ${setTitle}</h3><ul>`;
-                resultStr += `<li class="set-${setKey}">Set: ${setTitle}. Mean=${setsNew[setKey].mean}, SD=${roundTwoDecimals(setsNew[setKey].standardDeviation)}</li>`;
+                // resultStr += `<div class="set-${setKey}"><h3 >Answer round ${setTitle}</h3><ul>`;
+                resultStr += `<li class="set-${setKey}">Answer round: ${setTitle}. Mean=${setsNew[setKey].mean}, SD=${roundTwoDecimals(setsNew[setKey].standardDeviation)}</li>`;
                 // Object.keys(setData).forEach(aggregatorKey => {
                 //     resultStr += `<li class="set-${setKey}">${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 // });
@@ -701,7 +701,7 @@ ipcRenderer.on('responses', (event, data) => {
                 });
                 sets[setKey] = orderedSetData;
 
-                resultStr += `<div class="set-${setKey}"><h3 >Set ${title}</h3><ul>`;
+                resultStr += `<div class="set-${setKey}"><h3 >Round: ${title}</h3><ul>`;
                 Object.keys(setData).forEach(aggregatorKey => {
                     resultStr += `<li class="set-${setKey}">${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 });
@@ -720,7 +720,7 @@ ipcRenderer.on('responses', (event, data) => {
                         labels: Object.keys(setData),
                         datasets: [
                             {
-                                label: question.title + " (Set " + title + ")",
+                                label: question.title + " (Round: " + title + ")",
                                 fill: false,
                                 backgroundColor: backgroundColors[index],//"rgba(255, 99, 132, 0.2)",
                                 borderColor: backgroundColors[index],//"rgb(255, 99, 132)",
@@ -733,7 +733,7 @@ ipcRenderer.on('responses', (event, data) => {
                         responsive: false,
                         title: {
                             display: true,
-                            text: " Set " + title,//data.questionnaire.title + " Set " + setKey
+                            text: " Round: " + title,//data.questionnaire.title + " Round:" + setKey
                         },
                         scales: {
                             xAxes: [
@@ -851,19 +851,19 @@ ipcRenderer.on('responses', (event, data) => {
                 });
                 sets[setKey] = orderedSetData;
 
-                resultStr += `<div class="set-${setKey}"><h3 >Set ${title}</h3><ul>`;
+                resultStr += `<div class="set-${setKey}"><h3>Answer round ${title}</h3><ul>`;
                 Object.keys(setData).forEach(aggregatorKey => {
                     resultStr += `<li class="set-${setKey}">${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 });
                 resultStr += `</ul></div>`;
                 const dataset = {
-                    label: `Set ${title}`,
+                    label: `Answer round ${title}`,
                     fill: false,
                     backgroundColor: backgroundColors[index],//"rgba(255, 99, 132, 0.2)",
                     borderColor: backgroundColors[index],//"rgb(255, 99, 132)",
                     borderWidth: 1,
                     data: Object.values(setData),
-                    stack: `Set`,
+                    stack: `Round`,
                 };
 
                 datasets.push(dataset);
@@ -876,8 +876,8 @@ ipcRenderer.on('responses', (event, data) => {
 
             const canvas = document.createElement('canvas');
             // canvas.classList.add(`set-${setKey}`);
-            canvas.setAttribute('width', '400');
-            canvas.setAttribute('height', '400');
+            canvas.setAttribute('width', '600');
+            canvas.setAttribute('height', '600');
 
             questionGroup.appendChild(canvas);
 
@@ -890,7 +890,7 @@ ipcRenderer.on('responses', (event, data) => {
                 if(currentSet !== undefined){
                     title = currentSet.title !== undefined ? currentSet.title : currentSet._id;
                 }
-                prevValue.push(`Set ${title}`);
+                prevValue.push(`Round: ${title}`);
                 return prevValue;
             }, []);
             const data14 = [];
@@ -941,7 +941,7 @@ ipcRenderer.on('responses', (event, data) => {
                     responsive: false,
                     title: {
                         display: true,
-                        text: " Set " + question.title,//data.questionnaire.title + " Set " + setKey
+                        text: " Round: " + question.title,//data.questionnaire.title + " Round: " + setKey
                     },
                     scales: {
                         xAxes: [
@@ -951,7 +951,7 @@ ipcRenderer.on('responses', (event, data) => {
                                 stacked: true,
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Answer set'
+                                    labelString: 'Round'
                                 }
                             }
                         ],
@@ -1053,7 +1053,7 @@ ipcRenderer.on('responses', (event, data) => {
                 });
                 sets[setKey] = orderedSetData;
 
-                resultStr += `<div class="set-${setKey}"><h3 >Set ${title}</h3><ul>`;
+                resultStr += `<div class="set-${setKey}"><h3>Round: ${title}</h3><ul>`;
                 Object.keys(setData).forEach(aggregatorKey => {
                     resultStr += `<li class="set-${setKey}">${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 });
@@ -1096,14 +1096,15 @@ ipcRenderer.on('responses', (event, data) => {
                     data.push(d);
                 });
 
+                const color = backgroundColors[setIndex % backgroundColors.length];
                 const dataset = {
-                    label: `Set ${title}`,
+                    label: `Round: ${title}`,
                     // fill: true,
-                    backgroundColor: backgroundColors[setIndex],
-                    borderColor: LightenDarkenColor(backgroundColors[setIndex], -50, true),
+                    backgroundColor: color,
+                    borderColor: LightenDarkenColor(color, -50, true),
                     borderWidth: 1.5,
                     data: data,
-                    stack: `Set`,
+                    stack: `Round`,
                 };
                 // console.log("setData for set", title, setData);
                 datasets.push(dataset);
@@ -1116,8 +1117,8 @@ ipcRenderer.on('responses', (event, data) => {
 
             const canvas = document.createElement('canvas');
             // canvas.classList.add(`set-${setKey}`);
-            canvas.setAttribute('width', '400');
-            canvas.setAttribute('height', '400');
+            canvas.setAttribute('width', '600');
+            canvas.setAttribute('height', '600');
 
             questionGroup.appendChild(canvas);
 
@@ -1130,7 +1131,7 @@ ipcRenderer.on('responses', (event, data) => {
                 if(currentSet !== undefined){
                     title = currentSet.title !== undefined ? currentSet.title : currentSet._id;
                 }
-                prevValue.push(`Set ${title}`);
+                prevValue.push(`Round: ${title}`);
                 return prevValue;
             }, []);
             // const data14 = [];
@@ -1227,7 +1228,7 @@ ipcRenderer.on('responses', (event, data) => {
                     responsive: false,
                     title: {
                         display: true,
-                        text: " Set " + question.title + " (grouped answers)",//data.questionnaire.title + " Set " + setKey
+                        text: " Round: " + question.title + " (grouped answers)",//data.questionnaire.title + " Round " + setKey
                     },
                     scales: {
                         xAxes: [
@@ -1243,7 +1244,7 @@ ipcRenderer.on('responses', (event, data) => {
                                 // stacked: true,
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Answer set'
+                                    labelString: 'Answer Round'
                                 }
                             }
                         ],
@@ -1326,7 +1327,7 @@ ipcRenderer.on('responses', (event, data) => {
                 });
                 sets[setKey] = orderedSetData;
 
-                resultStr += `<div class="set-${setKey}"><h3 >Set ${title}</h3><ul>`;
+                resultStr += `<div class="set-${setKey}"><h3 >Round: ${title}</h3><ul>`;
                 Object.keys(setData).forEach(aggregatorKey => {
                     resultStr += `<li class="set-${setKey}">${aggregatorKey} by ${setData[aggregatorKey]} people</li>`;
                 });
@@ -1345,7 +1346,7 @@ ipcRenderer.on('responses', (event, data) => {
                         labels: Object.keys(setData),
                         datasets: [
                             {
-                                label: question.title + " (Set " + title + ")",
+                                label: question.title + " (Round: " + title + ")",
                                 fill: false,
                                 backgroundColor: backgroundColors[index],//"rgba(255, 99, 132, 0.2)",
                                 borderColor: backgroundColors[index],//"rgb(255, 99, 132)",
@@ -1358,7 +1359,7 @@ ipcRenderer.on('responses', (event, data) => {
                         responsive: false,
                         title: {
                             display: true,
-                            text: " Set " + title,//data.questionnaire.title + " Set " + setKey
+                            text: " Round: " + title,//data.questionnaire.title + " Round: " + setKey
                         },
                         scales: {
                             // xAxes: [{
