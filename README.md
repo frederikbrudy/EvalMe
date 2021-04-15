@@ -123,7 +123,7 @@ The following indicates the connections from the encoders to the Arduino.
 |                                            | B       | 16           | 6-wire A-6                                         |
 |                                            | +       | 5 Volt       | 3-wire click connector shared between all encoders |
 
-[//]: # (![images/wiring-button1.png](images/wiring-button1.png)
+<!--![images/wiring-button1.png](images/wiring-button1.png)-->
 
 ### Button 2
 |                                            | Encoder | Proto Shield | Connector                                          |
@@ -138,7 +138,7 @@ The following indicates the connections from the encoders to the Arduino.
 |                                            | +       | 5 Volt       | 3-wire click connector shared between all encoders |
 
 
-[//]: # (![images/wiring-button2.png](images/wiring-button2.png)
+<!-- ![images/wiring-button2.png](images/wiring-button2.png)--> 
 
 ### Button 3
 
@@ -154,7 +154,7 @@ The following indicates the connections from the encoders to the Arduino.
 |                                            | +       | 5 Volt       | 3-wire click connector shared between all encoders |
 
 
-[//]: # (![images/wiring-button3.png](images/wiring-button3.png)
+<!--![images/wiring-button3.png](images/wiring-button3.png)-->
 
 After assembling, uploading the code, and testing the mapping of the rotary encoder to the NeoPixel rings you might need to switch around which click connector from which button connects to which corresponding connector on the proto shield. But that&#39;s just a matter of flipping them to another.
 
@@ -220,7 +220,7 @@ To test the RFID, send the following to the receiver's / Uno's serial monitor `R
  All LEDs on top of the sender should turn off and the blue LED should blink. Use e.g. your student ID card to &quot;log in&quot; and then the encoders are usable.
 
 
-##License
+## License
 MIT license
 
 **EvalMe: Exploring the Value of New Technologies for In Situ Evaluation of Learning Experiences.**
