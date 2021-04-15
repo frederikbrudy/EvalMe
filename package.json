@@ -1,34 +1,7 @@
 {
   "name": "evalme",
-  "productName": "EvalMe",
   "version": "1.0.0",
-  "description": "EvalMe",
-  "main": "src/main.js",
-  "scripts": {
-    "start": "electron .",
-    "build-mac": "electron-packager . --platform=darwin"
-  },
-  "repository": "",
-  "keywords": [],
-  "author": "Frederik Brudy (fbrudy.net)",
-  "license": "MIT",
-  "devDependencies": {
-    "electron": "^7.1.4",
-    "electron-packager": "^14.2.0",
-    "electron-rebuild": "^1.8.8"
-  },
-  "dependencies": {
-    "debug": "^4.1.1",
-    "electron-log": "^4.0.0",
-    "electron-prompt": "^1.5.1",
-    "electron-settings": "^3.2.0",
-    "electron-shortcut-normalizer": "^1.0.0",
-    "glob": "^7.1.6",
-    "highlight.js": "^9.17.1",
-    "json2xls": "^0.1.2",
-    "md5": "^2.2.1",
-    "nedb": "^1.8.0",
-    "serialport": "^8.0.5",
-    "uuid": "^3.3.3"
-  }
+  "description": "Repository accompanying the ACM CHI 2021 paper EvalMe: Exploring the Value of New Technologies for In Situ Evaluation of Learning Experiences. Published in Proceedings of the ACM Conference on Human Factors in Computing Systems 2021 (ACM CHI '21), May 8–13, 2021, Yokohama, Japan. DOI: https://doi.org/10.1145/3411764.3445749",
+  "author": "Susan Lechelt, Frederik Brudy, Nicolai Marquardt, Yvonne Rogers",
+  "license": "MIT"
 }

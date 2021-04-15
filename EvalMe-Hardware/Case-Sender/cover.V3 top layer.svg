@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1726.3 1295.43" enable-background="new 0 0 1726.3 1295.43" xml:space="preserve">
+<g id="bottom_and_top">
+	<path fill="none" stroke="#FF0000" stroke-miterlimit="10" d="M703.064,464.882H53.459c-16.24,0-29.527-14.431-29.527-32.069
+		V57.581c0-17.638,13.287-32.069,29.527-32.069h649.605c16.241,0,29.529,14.431,29.529,32.069v375.232
+		C732.593,450.451,719.305,464.882,703.064,464.882z"/>
+	<path fill="none" stroke="#FF0000" stroke-miterlimit="10" d="M397.565,385.873c0,7.828-6.344,14.172-14.172,14.172
+		c-7.829,0-14.175-6.344-14.175-14.172c0-7.829,6.346-14.175,14.175-14.175C391.221,371.698,397.565,378.044,397.565,385.873z"/>
+</g>
+<g id="cover_button_and_LED_holes__x28_large_x29_">
+	<circle fill="none" stroke="#FF0000" stroke-miterlimit="10" cx="195.061" cy="244.7" r="56.693"/>
+	
+		<ellipse transform="matrix(0.0228 -0.9997 0.9997 0.0228 124.8602 617.1243)" fill="none" stroke="#FF0000" stroke-miterlimit="10" cx="378.098" cy="244.694" rx="56.693" ry="56.693"/>
+	<path fill="none" stroke="#FF0000" stroke-miterlimit="10" d="M617.786,244.825c0,31.311-25.382,56.693-56.691,56.693
+		c-31.311,0-56.694-25.382-56.694-56.693c0-31.311,25.383-56.693,56.694-56.693C592.404,188.132,617.786,213.515,617.786,244.825z"
+		/>
+</g>
+</svg>
