@@ -13,7 +13,7 @@
   "author": "Frederik Brudy (fbrudy.net)",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^13.6.6",
+    "electron": "^18.3.7",
     "electron-packager": "^14.2.0",
     "electron-rebuild": "^1.8.8"
   },
